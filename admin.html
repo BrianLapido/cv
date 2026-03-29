@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brian Ariel Lapido | CV Admin</title>
+    <meta
+      name="description"
+      content="Panel de administracion privado para editar el CV app."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-theme="professional">
+    <section class="auth-shell" id="admin-auth">
+      <article class="auth-card">
+        <p class="panel-eyebrow">Ruta privada</p>
+        <h1 id="auth-title">Acceso administrador</h1>
+        <p id="auth-copy">
+          Esta ruta administra el contenido del CV. Configura o valida tu PIN para
+          continuar.
+        </p>
+        <form class="auth-form" id="auth-form">
+          <label class="field-stack">
+            <span id="auth-label">PIN de administrador</span>
+            <input
+              id="auth-input"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+          <p class="inline-note" id="auth-note">
+            Proteccion local de navegador. Para seguridad real despues conviene mover
+            esto a backend.
+          </p>
+          <button type="submit" id="auth-submit">Ingresar</button>
+        </form>
+      </article>
+    </section>
+
+    <input
+      id="specialty-upload-input"
+      type="file"
+      hidden
+      multiple
+      accept="image/*,video/*,.pdf"
+    />
+    <input
+      id="profile-photo-input"
+      type="file"
+      hidden
+      accept="image/*"
+    />
+
+    <section class="folder-modal is-hidden" id="admin-folder-modal">
+      <article class="folder-modal-card">
+        <div class="folder-modal-head">
+          <div>
+            <p class="panel-eyebrow">Carpeta multimedia</p>
+            <h2 id="admin-folder-title">Archivos</h2>
+          </div>
+          <button type="button" data-action="close-folder-modal">Cerrar</button>
+        </div>
+        <div class="folder-modal-body" id="admin-folder-body"></div>
+      </article>
+    </section>
+
+    <div class="app-shell is-hidden" id="admin-app">
+      <aside class="control-panel">
+        <section class="panel-card brand-card">
+          <p class="panel-eyebrow">CV App Studio</p>
+          <h1>Panel administrador</h1>
+          <p>
+            Ruta privada para editar el CV, cambiar estilos, ordenar bloques y
+            administrar contenido.
+          </p>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-eyebrow">Sesion</p>
+              <h2>Control de acceso</h2>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button type="button" data-action="logout-admin">Cerrar sesion admin</button>
+          </div>
+          <p class="inline-note">La vista publica queda disponible en la ruta principal.</p>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-eyebrow">Estilos</p>
+              <h2>Selector visual</h2>
+            </div>
+          </div>
+          <div class="theme-selector">
+            <button
+              type="button"
+              class="theme-option"
+              data-action="set-theme"
+              data-theme-choice="gamer"
+            >
+              <strong>Gamer</strong>
+              <span>Arcade retro + referencias de juegos iconicos.</span>
+            </button>
+            <button
+              type="button"
+              class="theme-option"
+              data-action="set-theme"
+              data-theme-choice="professional"
+            >
+              <strong>Profesional</strong>
+              <span>Orientado a full stack, codigo e IA para recruiters.</span>
+            </button>
+            <button
+              type="button"
+              class="theme-option"
+              data-action="set-theme"
+              data-theme-choice="classic"
+            >
+              <strong>Clasico</strong>
+              <span>Diseño sobrio, limpio y cercano al CV tradicional.</span>
+            </button>
+            <button
+              type="button"
+              class="theme-option"
+              data-action="set-theme"
+              data-theme-choice="informatica"
+            >
+              <strong>Informatico</strong>
+              <span>Visual tecnico y adaptable a distintos sectores.</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-eyebrow">Edicion</p>
+              <h2>Acciones rapidas</h2>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button type="button" data-action="quick-add" data-target="experience">
+              Agregar experiencia
+            </button>
+            <button type="button" data-action="quick-add" data-target="education">
+              Agregar formacion
+            </button>
+            <button type="button" data-action="quick-add" data-target="skills">
+              Agregar habilidad
+            </button>
+            <button type="button" data-action="quick-add" data-target="specialties">
+              Agregar especialidad
+            </button>
+            <button type="button" data-action="quick-add" data-target="socials">
+              Agregar red social
+            </button>
+            <button type="button" data-action="export-json">
+              Exportar respaldo
+            </button>
+            <button type="button" data-action="restore-default" class="ghost-button">
+              Restaurar demo
+            </button>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-eyebrow">Como usar</p>
+              <h2>Interacciones</h2>
+            </div>
+          </div>
+          <ul class="help-list">
+            <li>Arrastra secciones y tarjetas usando el indicador `mover`.</li>
+            <li>Todos los campos se guardan automaticamente en tu navegador.</li>
+            <li>Podes cargar imagenes o videos con URLs dentro de cada especialidad.</li>
+            <li>La vista publica solo muestra contenido limpio y enlaces de contacto.</li>
+          </ul>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <section class="hero-grid">
+          <article class="hero-card portrait-card">
+            <div class="portrait-frame">
+              <img
+                id="admin-photo"
+                src="./img/perfil.png"
+                alt="Foto de perfil de Brian Ariel Lapido"
+              />
+            </div>
+            <div class="hero-badges">
+              <span>Disponible jornada completa</span>
+              <span>Buenos Aires</span>
+              <span>Full Stack en formacion</span>
+            </div>
+          </article>
+
+          <article class="hero-card intro-card">
+            <div class="hero-topline">
+              <p class="panel-eyebrow">Perfil principal</p>
+              <span class="autosave-pill">Guardado automatico activo</span>
+            </div>
+            <div class="profile-fields" id="profile-fields"></div>
+          </article>
+        </section>
+
+        <section
+          class="board"
+          id="cv-board"
+          aria-label="Editor visual del curriculum"
+        ></section>
+      </main>
+    </div>
+
+    <script src="./src/app.js"></script>
+  </body>
+</html>

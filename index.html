@@ -1,168 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Currículum Vitae</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      line-height: 1.6;
-      background-color:lightyellow;
-      color: #333;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brian Ariel Lapido | CV Publico</title>
+    <meta
+      name="description"
+      content="CV publico de Brian Ariel Lapido con acceso directo a redes, WhatsApp y email."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-theme="professional">
+    <section class="folder-modal is-hidden" id="public-folder-modal">
+      <article class="folder-modal-card">
+        <div class="folder-modal-head">
+          <div>
+            <p class="panel-eyebrow">Carpeta multimedia</p>
+            <h2 id="public-folder-title">Archivos</h2>
+          </div>
+          <button type="button" data-action="close-public-folder">Cerrar</button>
+        </div>
+        <div class="folder-modal-body" id="public-folder-body"></div>
+      </article>
+    </section>
 
+    <main class="public-shell">
+      <section class="public-hero">
+        <article class="hero-card portrait-card">
+          <div class="portrait-frame">
+            <img id="public-photo" src="./img/perfil.png" alt="Foto de Brian Ariel Lapido" />
+          </div>
+          <div class="hero-badges" id="public-badges"></div>
+        </article>
 
-    @keyframes mover{
-      0%{opacity: 0;}
-      25%{transform:translateX(-50px);}
-      50%{transform: scale(1.1);}
-    }
-        .perfil{
-          filter: brightness(1);
-          mix-blend-mode: multiply;
-          background-color: lightyellow;
-          opacity: 1;
-          height: 20%;
-          width: 200px;
-          position: relative;
-          left: 80%;
-          animation: mover 3s 1;
-        }
+        <article class="hero-card public-intro">
+          <p class="panel-eyebrow">CV Publico</p>
+          <div id="public-profile"></div>
+        </article>
+      </section>
 
-    h1, h2 {
-      color: #2c3e50;
-    }
+      <section class="public-section-list" id="public-sections"></section>
+    </main>
 
-    .section {
-      margin-bottom: 30px;
-      padding: 20px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      opacity: 0;
-      transition: all 0.8s ease;
-    }
-    .section.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .section:hover{
-        text-decoration: underline;
-    }
-    hr {
-      border: none;
-      height: 1px;
-      background-color:black;
-      margin: 10px 0 20px 0;
-    }
-
-
-  </style>
-</head>
-<body>
-    <img src="./img/img-cv.jpg" class="img-thumbnail" alt="img-cv">
-  <h1>Brian Ariel Lapido</h1>
-  <p><strong>Email:</strong> brianlapido9@gmail.com | <strong>Teléfono:</strong> 1157979783 | <strong>Ubicación:</strong> Buenos Aires, localidad de Moreno-La reja</p>
-
-  <div class="section">
-    <h2>Perfil Profesional</h2>
-    <hr style="height: 3px; background-color: #3498db; border: none;">
-<ul>
-  <li><p>Soy una persona responsable con compromiso y por sobre todo compañerismo.</p></li>
-  <li><p>Con facil aprendizaje y ganas de superarme a mi mismo todos los días, desarrollandome en todo tipo de tareas.</p></li>
-  <li><p>Busco una mejor estabilidad y un cambio de entorno en el ambito laboral</p></li>
-</ul>
-  </div>
-
-  <div class="section">
-    <h2>Experiencia Laboral</h2>
-    <hr style="height: 3px; background-color: #3498db; border: none;">
-    <h3>Hospital Mariano y Luciano de la Vega - Mantenimiento</h3>
-    <ul>
-      <li><p><em>Fecha de inicio: 02/01/2014 - Trabajando en la actualidad </em></p></li>
-      <li><p>Responsable de tareas de mantenimiento en general:</p></li>
-        <p>Plomeria</p>
-        <p>Soldadura(mig, autogena, electrica).</p>
-        <p>Electricidad</p>
-        <p>Mantenimiento de motores trifasicos</p>
-      <li><p>Carga y transporte de tubos de oxigeno</p></li>
-      <li><p>Cambio de tubo de Co2 en el area de quirofano</p></li>
-    </ul>
-
-  </div>
-
-  <div class="section">
-    <h2>Educación</h2>
-    <hr style="height: 3px; background-color: #3498db; border: none;">
-    <h3>Secundario completo: Titulo de electromecanico</h3>
-    <ul>
-      <li><p><strong>E.e.s.t N°2- Moreno</strong> | <em>Desde: año 2008 - Hasta: año 2013</em></p></li>
-    <li><h3>Curso con certificado completo de tecnico en refrigeración:</h3></li>
-    <p><strong>Instituto educativo "Eddis"</strong> | <em>Año: 2023</em></p>
-    <h3>Actualmente estudiando desarrollo web full stack.
-    <li><p>Certificado de desarrollo web del primer curso aprobado y curso de javaScript en proceso</p></h3></li>
-    <p><strong>Plataforma "CoderHouse"</strong>  |  <em>Año: 2025</em></p>
-    </ul>
-    
-  </div>
-
-  <div class="section">
-    <h2>Habilidades</h2>
-    <hr style="height: 3px; background-color: #3498db; border: none;">
-    <ul>
-      <li>Electricidad</li>
-      <li>Motores trifasicos</li>
-      <li>Refrigeracion (Aires acondicionados - heladeras)</li>
-      <li>Plomeria</li>
-      <li>Soldadura(electrica, mig, autogena)</li>
-      <li>Construccion en seco</li>
-      <li>Desarrollo de paginas web "Junior"</li>
-    </ul>
-  </div>
-
-  <div class="section">
-    <h2>Idiomas</h2>
-    <hr style="height: 3px; background-color: #3498db; border: none;">
-    <ul>
-      <li>Español: Nativo</li>
-      <li>Inglés: Intermedio</li>
-    </ul>
-  </div>
-
-  <div class="section">
-    <h2>Otros Datos de Interés</h2>
-    <hr style="height: 3px; background-color: #3498db; border: none;">
-        <ul>
-          <li><p><strong>Disponibilidad:</strong> Jornada completa</p></li>
-          <li><p><strong>Licencia de conducir:</strong> Clases A.1.3 y B.1</p></li>
-          <li><p><strong>Hobbie:</strong>En la actualidad tengo como hobbie el diseño e impresión de productos en 3d</p></li>
-        </ul>
-  </div>
-
-  <script>
-    // Animaciones al hacer scroll
-    const sections = document.querySelectorAll('.section');
-
-    function showSections() {
-      const triggerBottom = window.innerHeight * 0.85;
-
-      sections.forEach(section => {
-        const sectionTop = section.getBoundingClientRect().top;
-
-        if (sectionTop < triggerBottom) {
-          section.classList.add('visible');
-        } else {
-          section.classList.remove('visible');
-        }
-      });
-    }
-
-    window.addEventListener('scroll', showSections);
-    window.addEventListener('load', showSections);
-  </script>
-
-</body>
+    <script src="./src/public.js"></script>
+  </body>
 </html>
-
