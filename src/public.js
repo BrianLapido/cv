@@ -1,6 +1,6 @@
 (function () {
   const STORAGE_KEY = "brian-lapido-cv-app-v2";
-  const DATA_ENDPOINT = "/api/cv-data";
+  const DATA_FILE_URL = "./data/cv-data.json";
   const $profile = document.getElementById("public-profile");
   const $badges = document.getElementById("public-badges");
   const $sections = document.getElementById("public-sections");
@@ -101,7 +101,7 @@
 
   async function load() {
     try {
-      const response = await window.fetch(DATA_ENDPOINT, { cache: "no-store" });
+      const response = await window.fetch(DATA_FILE_URL, { cache: "no-store" });
       if (response.ok) {
         return normalize(await response.json());
       }

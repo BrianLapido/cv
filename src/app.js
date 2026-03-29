@@ -1,5 +1,7 @@
 (function () {
   const STORAGE_KEY = "brian-lapido-cv-app-v2";
+  const GITHUB_CONFIG_KEY = "brian-lapido-github-config";
+  const DATA_FILE_URL = "./data/cv-data.json";
   const DATA_ENDPOINT = "/api/cv-data";
   const PIN_KEY = "brian-lapido-admin-pin";
   const SESSION_KEY = "brian-lapido-admin-session";
@@ -21,6 +23,11 @@
   const $folderTitle = document.getElementById("admin-folder-title");
   const $folderBody = document.getElementById("admin-folder-body");
   const $saveStatus = document.getElementById("save-status");
+  const $githubOwner = document.getElementById("github-owner");
+  const $githubRepo = document.getElementById("github-repo");
+  const $githubBranch = document.getElementById("github-branch");
+  const $githubPath = document.getElementById("github-path");
+  const $githubToken = document.getElementById("github-token");
 
   function uid(prefix) {
     return prefix + "-" + Math.random().toString(36).slice(2, 10);
@@ -230,9 +237,125 @@
     }
   }
 
+  function loadGitHubConfig() {
+    try {
+      const saved = JSON.parse(
+        window.localStorage.getItem(GITHUB_CONFIG_KEY) || "{}"
+      );
+      return {
+        owner: saved.owner || "BrianLapido",
+        repo: saved.repo || "cv",
+        branch: saved.branch || "main",
+        path: saved.path || "data/cv-data.json",
+        token: saved.token || "",
+      };
+    } catch (error) {
+      return {
+        owner: "BrianLapido",
+        repo: "cv",
+        branch: "main",
+        path: "data/cv-data.json",
+        token: "",
+      };
+    }
+  }
+
+  function saveGitHubConfig() {
+    const config = {
+      owner: $githubOwner ? $githubOwner.value.trim() : "",
+      repo: $githubRepo ? $githubRepo.value.trim() : "",
+      branch: $githubBranch ? $githubBranch.value.trim() : "",
+      path: $githubPath ? $githubPath.value.trim() : "",
+      token: $githubToken ? $githubToken.value.trim() : "",
+    };
+
+    window.localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(config));
+    return config;
+  }
+
+  function applyGitHubConfig() {
+    const config = loadGitHubConfig();
+    if ($githubOwner) {
+      $githubOwner.value = config.owner;
+    }
+    if ($githubRepo) {
+      $githubRepo.value = config.repo;
+    }
+    if ($githubBranch) {
+      $githubBranch.value = config.branch;
+    }
+    if ($githubPath) {
+      $githubPath.value = config.path;
+    }
+    if ($githubToken) {
+      $githubToken.value = config.token;
+    }
+  }
+
+  function textToBase64(value) {
+    const bytes = new TextEncoder().encode(value);
+    let binary = "";
+    bytes.forEach(function (byte) {
+      binary += String.fromCharCode(byte);
+    });
+    return window.btoa(binary);
+  }
+
+  async function publishToGitHub(config) {
+    const apiBase =
+      "https://api.github.com/repos/" +
+      encodeURIComponent(config.owner) +
+      "/" +
+      encodeURIComponent(config.repo) +
+      "/contents/" +
+      config.path
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/");
+    const headers = {
+      Accept: "application/vnd.github+json",
+      Authorization: "Bearer " + config.token,
+      "X-GitHub-Api-Version": "2022-11-28",
+    };
+    let sha = "";
+
+    const current = await window.fetch(
+      apiBase + "?ref=" + encodeURIComponent(config.branch),
+      { headers: headers }
+    );
+
+    if (current.ok) {
+      const payload = await current.json();
+      sha = payload.sha || "";
+    } else if (current.status !== 404) {
+      throw new Error("No se pudo consultar el archivo remoto");
+    }
+
+    const publishResponse = await window.fetch(apiBase, {
+      method: "PUT",
+      headers: Object.assign({}, headers, {
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify({
+        message:
+          "Actualizar CV app desde panel admin - " +
+          new Date().toISOString(),
+        content: textToBase64(JSON.stringify(state, null, 2)),
+        branch: config.branch,
+        sha: sha || undefined,
+      }),
+    });
+
+    if (!publishResponse.ok) {
+      throw new Error("GitHub rechazo la publicacion");
+    }
+
+    return publishResponse.json();
+  }
+
   async function loadDeploymentState() {
     try {
-      const response = await window.fetch(DATA_ENDPOINT, { cache: "no-store" });
+      const response = await window.fetch(DATA_FILE_URL, { cache: "no-store" });
       if (!response.ok) {
         throw new Error("No se pudo leer el deployment");
       }
@@ -248,8 +371,23 @@
 
   async function saveDeploymentState() {
     setSaveStatus("Guardando cambios en el deployment...");
+    const config = saveGitHubConfig();
 
     try {
+      if (
+        config.owner &&
+        config.repo &&
+        config.branch &&
+        config.path &&
+        config.token
+      ) {
+        await publishToGitHub(config);
+        setSaveStatus(
+          "Cambios publicados por GitHub API. El deployment se actualizara cuando GitHub procese el commit."
+        );
+        return;
+      }
+
       const response = await window.fetch(DATA_ENDPOINT, {
         method: "POST",
         headers: {
@@ -262,10 +400,14 @@
         throw new Error("No se pudieron guardar los cambios");
       }
 
-      setSaveStatus("Cambios guardados en deployment correctamente.");
+      setSaveStatus(
+        "Cambios guardados en el servidor local. Completa la configuracion GitHub API para publicarlos al repo."
+      );
     } catch (error) {
       setSaveStatus("No se pudieron guardar los cambios en deployment.");
-      window.alert("Fallo el guardado del deployment. Revisa si el servidor permite escritura.");
+      window.alert(
+        "Fallo la publicacion. Revisa el token, owner/repo/branch o si el servidor permite escritura."
+      );
     }
   }
 
@@ -349,6 +491,7 @@
     if ($adminApp) {
       $adminApp.classList.remove("is-hidden");
     }
+    applyGitHubConfig();
     await loadDeploymentState();
     renderApp();
     ensureTransparentProfilePhoto();
@@ -988,6 +1131,12 @@
       handleProfilePhotoUpload((event.target.files || [])[0]);
     });
   }
+
+  [$githubOwner, $githubRepo, $githubBranch, $githubPath, $githubToken]
+    .filter(Boolean)
+    .forEach(function (input) {
+      input.addEventListener("input", saveGitHubConfig);
+    });
 
   bootAdmin();
 })();

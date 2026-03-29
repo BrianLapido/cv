@@ -177,6 +177,45 @@
         <section class="panel-card">
           <div class="panel-heading">
             <div>
+              <p class="panel-eyebrow">GitHub API</p>
+              <h2>Publicacion</h2>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <label class="field-stack">
+              <span>Owner</span>
+              <input id="github-owner" placeholder="BrianLapido" />
+            </label>
+            <label class="field-stack">
+              <span>Repo</span>
+              <input id="github-repo" placeholder="cv" />
+            </label>
+            <label class="field-stack">
+              <span>Branch</span>
+              <input id="github-branch" placeholder="main" />
+            </label>
+            <label class="field-stack">
+              <span>Archivo</span>
+              <input id="github-path" placeholder="data/cv-data.json" />
+            </label>
+          </div>
+          <label class="field-stack">
+            <span>Token GitHub</span>
+            <input
+              id="github-token"
+              type="password"
+              autocomplete="off"
+              placeholder="Fine-grained PAT con Contents: write"
+            />
+          </label>
+          <p class="inline-note">
+            El token queda solo en este navegador. Si esta configuracion existe, Guardar cambios publica por GitHub API.
+          </p>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-heading">
+            <div>
               <p class="panel-eyebrow">Como usar</p>
               <h2>Interacciones</h2>
             </div>
