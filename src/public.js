@@ -1,5 +1,6 @@
 (function () {
   const STORAGE_KEY = "brian-lapido-cv-app-v2";
+  const DATA_ENDPOINT = "/api/cv-data";
   const $profile = document.getElementById("public-profile");
   const $badges = document.getElementById("public-badges");
   const $sections = document.getElementById("public-sections");
@@ -98,7 +99,16 @@
     },
   };
 
-  function load() {
+  async function load() {
+    try {
+      const response = await window.fetch(DATA_ENDPOINT, { cache: "no-store" });
+      if (response.ok) {
+        return normalize(await response.json());
+      }
+    } catch (error) {
+      /* fallback below */
+    }
+
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
       return saved ? normalize(JSON.parse(saved)) : defaults;
@@ -247,8 +257,8 @@
     }).join("") + "</ul></section>";
   }
 
-  function render() {
-    const state = load();
+  async function render() {
+    const state = await load();
     document.body.dataset.theme = state.theme || "professional";
     const photo = document.getElementById("public-photo");
     if (photo) {
@@ -314,6 +324,8 @@
   }
 
   window.addEventListener("storage", render);
+  window.addEventListener("focus", render);
+  window.setInterval(render, 15000);
 
   render();
 })();

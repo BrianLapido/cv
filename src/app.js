@@ -1,5 +1,6 @@
 (function () {
   const STORAGE_KEY = "brian-lapido-cv-app-v2";
+  const DATA_ENDPOINT = "/api/cv-data";
   const PIN_KEY = "brian-lapido-admin-pin";
   const SESSION_KEY = "brian-lapido-admin-session";
   const $board = document.getElementById("cv-board");
@@ -19,6 +20,7 @@
   const $folderModal = document.getElementById("admin-folder-modal");
   const $folderTitle = document.getElementById("admin-folder-title");
   const $folderBody = document.getElementById("admin-folder-body");
+  const $saveStatus = document.getElementById("save-status");
 
   function uid(prefix) {
     return prefix + "-" + Math.random().toString(36).slice(2, 10);
@@ -216,6 +218,55 @@
 
   function save() {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if ($saveStatus) {
+      $saveStatus.textContent =
+        "Borrador local actualizado. Presiona Guardar cambios para impactar el deployment.";
+    }
+  }
+
+  function setSaveStatus(message) {
+    if ($saveStatus) {
+      $saveStatus.textContent = message;
+    }
+  }
+
+  async function loadDeploymentState() {
+    try {
+      const response = await window.fetch(DATA_ENDPOINT, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error("No se pudo leer el deployment");
+      }
+      const remote = await response.json();
+      state = normalizeState(remote);
+      save();
+      setSaveStatus("Contenido cargado desde la version publicada del deployment.");
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async function saveDeploymentState() {
+    setSaveStatus("Guardando cambios en el deployment...");
+
+    try {
+      const response = await window.fetch(DATA_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(state),
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudieron guardar los cambios");
+      }
+
+      setSaveStatus("Cambios guardados en deployment correctamente.");
+    } catch (error) {
+      setSaveStatus("No se pudieron guardar los cambios en deployment.");
+      window.alert("Fallo el guardado del deployment. Revisa si el servidor permite escritura.");
+    }
   }
 
   function url(value) {
@@ -291,15 +342,17 @@
     $authInput.value = "";
   }
 
-  function showAdmin() {
+  async function showAdmin() {
     if ($auth) {
       $auth.classList.add("is-hidden");
     }
     if ($adminApp) {
       $adminApp.classList.remove("is-hidden");
     }
+    await loadDeploymentState();
     renderApp();
     ensureTransparentProfilePhoto();
+    setSaveStatus("Contenido cargado desde la version publicada del deployment.");
   }
 
   async function unlockAdmin(pin) {
@@ -313,7 +366,7 @@
       const hash = await toHash(cleanPin);
       window.localStorage.setItem(PIN_KEY, hash);
       setUnlocked(true);
-      showAdmin();
+      await showAdmin();
       return;
     }
 
@@ -326,7 +379,7 @@
     }
 
     setUnlocked(true);
-    showAdmin();
+    await showAdmin();
   }
 
   function logoutAdmin() {
@@ -340,7 +393,7 @@
     setAuthMode(hasPin() ? "login" : "setup");
   }
 
-  function bootAdmin() {
+  async function bootAdmin() {
     if (!$auth || !$adminApp) {
       renderApp();
       return;
@@ -360,7 +413,7 @@
       return;
     }
 
-    showAdmin();
+    await showAdmin();
   }
 
   function readFileAsDataUrl(file) {
@@ -737,6 +790,10 @@
     if (action === "set-theme") {
       state.theme = button.dataset.themeChoice;
       renderApp();
+      return;
+    }
+    if (action === "save-deployment") {
+      saveDeploymentState();
       return;
     }
     if (action === "logout-admin") {

@@ -144,6 +144,9 @@
             </div>
           </div>
           <div class="quick-actions">
+            <button type="button" data-action="save-deployment">
+              Guardar cambios
+            </button>
             <button type="button" data-action="quick-add" data-target="experience">
               Agregar experiencia
             </button>
@@ -166,6 +169,9 @@
               Restaurar demo
             </button>
           </div>
+          <p class="inline-note" id="save-status">
+            Los cambios del panel son un borrador local hasta que presiones Guardar cambios.
+          </p>
         </section>
 
         <section class="panel-card">
@@ -204,7 +210,7 @@
           <article class="hero-card intro-card">
             <div class="hero-topline">
               <p class="panel-eyebrow">Perfil principal</p>
-              <span class="autosave-pill">Guardado automatico activo</span>
+              <span class="autosave-pill">Borrador local activo</span>
             </div>
             <div class="profile-fields" id="profile-fields"></div>
           </article>

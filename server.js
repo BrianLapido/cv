@@ -4,6 +4,9 @@ const path = require("node:path");
 
 const PORT = Number(process.env.PORT) || 4173;
 const ROOT = __dirname;
+const DATA_DIR = path.join(ROOT, "data");
+const DATA_FILE = path.join(DATA_DIR, "cv-data.json");
+
 const MIME = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
@@ -13,6 +16,7 @@ const MIME = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".svg": "image/svg+xml",
+  ".webp": "image/webp",
 };
 
 function resolveFile(urlPath) {
@@ -30,9 +34,90 @@ function resolveFile(urlPath) {
   return file.startsWith(ROOT) ? file : null;
 }
 
+function ensureDataFile() {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+
+  if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, "{}", "utf8");
+  }
+}
+
+function readBody(request) {
+  return new Promise(function (resolve, reject) {
+    let body = "";
+
+    request.on("data", function (chunk) {
+      body += chunk;
+    });
+
+    request.on("end", function () {
+      resolve(body);
+    });
+
+    request.on("error", reject);
+  });
+}
+
+ensureDataFile();
+
 http
-  .createServer(function (request, response) {
-    const file = resolveFile(request.url || "/");
+  .createServer(async function (request, response) {
+    const url = new URL(request.url || "/", "http://localhost");
+
+    if (url.pathname === "/api/cv-data" && request.method === "GET") {
+      fs.readFile(DATA_FILE, "utf8", function (error, content) {
+        if (error) {
+          response.writeHead(500, {
+            "Content-Type": "application/json; charset=utf-8",
+          });
+          response.end(JSON.stringify({ error: "read_failed" }));
+          return;
+        }
+
+        response.writeHead(200, {
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store",
+        });
+        response.end(content);
+      });
+      return;
+    }
+
+    if (url.pathname === "/api/cv-data" && request.method === "POST") {
+      try {
+        const body = await readBody(request);
+        const parsed = JSON.parse(body || "{}");
+
+        fs.writeFile(
+          DATA_FILE,
+          JSON.stringify(parsed, null, 2),
+          "utf8",
+          function (error) {
+            if (error) {
+              response.writeHead(500, {
+                "Content-Type": "application/json; charset=utf-8",
+              });
+              response.end(JSON.stringify({ error: "write_failed" }));
+              return;
+            }
+
+            response.writeHead(200, {
+              "Content-Type": "application/json; charset=utf-8",
+              "Cache-Control": "no-store",
+            });
+            response.end(JSON.stringify({ ok: true }));
+          }
+        );
+      } catch (error) {
+        response.writeHead(400, {
+          "Content-Type": "application/json; charset=utf-8",
+        });
+        response.end(JSON.stringify({ error: "invalid_payload" }));
+      }
+      return;
+    }
+
+    const file = resolveFile(url.pathname);
 
     if (!file) {
       response.writeHead(403);
@@ -48,7 +133,8 @@ http
       }
 
       response.writeHead(200, {
-        "Content-Type": MIME[path.extname(file).toLowerCase()] || "application/octet-stream",
+        "Content-Type":
+          MIME[path.extname(file).toLowerCase()] || "application/octet-stream",
       });
       response.end(content);
     });
